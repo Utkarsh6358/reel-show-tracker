@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: reel-tracker-backend
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: OMDB_KEY
+        sync: false
+      - key: SHEET_ID
+        sync: false
