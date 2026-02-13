@@ -6,25 +6,52 @@ const reelRoutes = require("./routes/reelRoutes");
 
 const app = express();
 
-// Updated CORS for production
-// Replace your current CORS config with this:
+// ✅ CORRECTED CORS CONFIGURATION
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://reel-show-tracker-n0i5zo3bb-utkarsh-kumars-projects-0743eada.vercel.app',
+  'https://reel-show-tracker-2tky433yq-utkarsh-kumars-projects-0743eada.vercel.app',
+  'https://reel-show-tracker.onrender.com'
+];
+
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://reel-show-tracker.vercel.apphttps://reel-show-tracker-n0i5zo3bb-utkarsh-kumars-projects-0743eada.vercel.app/', // Your Vercel frontend URL
-    'https://reel-show-tracker.onrender.com' // Your backend URL
-  ],
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, etc)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) === -1) {
+      console.log('❌ Blocked origin:', origin);
+      return callback(new Error('CORS not allowed'), false);
+    }
+    console.log('✅ Allowed origin:', origin);
+    return callback(null, true);
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+  optionsSuccessStatus: 200
 }));
+
+// Handle preflight requests
+app.options('*', cors());
 
 app.use(express.json({ limit: '10mb' }));
 
-// Request logging
+// Request logging with CORS info
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
   console.log('Origin:', req.headers.origin);
+  console.log('User-Agent:', req.headers['user-agent']);
+  
+  // Add CORS headers manually as backup
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, Origin, X-Requested-With');
+  }
+  
   next();
 });
 
@@ -55,7 +82,7 @@ app.get("/health", (req, res) => {
   });
 });
 
-// DEBUG ENDPOINT - Add this before your routes
+// DEBUG ENDPOINT - Google Sheets diagnostic
 app.get("/debug/google", async (req, res) => {
   console.log("🔍 Debug endpoint called");
   
@@ -127,11 +154,24 @@ app.get("/debug/google", async (req, res) => {
       console.log("❌ No Google credentials found in env vars");
     }
 
+    // Add CORS headers to debug response
+    res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.json(debug);
   } catch (error) {
     console.error("❌ Debug endpoint error:", error);
     res.status(500).json({ error: error.message, stack: error.stack });
   }
+});
+
+// Test endpoint to check CORS
+app.get("/test-cors", (req, res) => {
+  res.json({
+    message: "CORS is working!",
+    yourOrigin: req.headers.origin,
+    allowedOrigins: allowedOrigins,
+    headers: req.headers
+  });
 });
 
 // Routes
@@ -154,7 +194,9 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Health check: http://localhost:${PORT}/health`);
-  console.log(`Debug endpoint: http://localhost:${PORT}/debug/google`);
+  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`✅ Health check: http://localhost:${PORT}/health`);
+  console.log(`✅ Debug endpoint: http://localhost:${PORT}/debug/google`);
+  console.log(`✅ Test CORS: http://localhost:${PORT}/test-cors`);
+  console.log(`✅ Allowed origins:`, allowedOrigins);
 });
