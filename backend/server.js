@@ -7,9 +7,16 @@ const reelRoutes = require("./routes/reelRoutes");
 const app = express();
 
 // Updated CORS for production
+// Replace your current CORS config with this:
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://reel-tracker-frontend.onrender.com', 'https://reel-show-tracker.onrender.com'],
-  credentials: true
+  origin: [
+    'http://localhost:3000',
+    'https://reel-show-tracker.vercel.apphttps://reel-show-tracker-n0i5zo3bb-utkarsh-kumars-projects-0743eada.vercel.app/', // Your Vercel frontend URL
+    'https://reel-show-tracker.onrender.com' // Your backend URL
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json({ limit: '10mb' }));
