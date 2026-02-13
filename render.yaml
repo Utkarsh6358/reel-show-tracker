@@ -1,4 +1,4 @@
-services:
+﻿services:
   - type: web
     name: reel-tracker-backend
     runtime: node
@@ -23,7 +23,6 @@ services:
     runtime: static
     repo: https://github.com/Utkarsh6358/reel-show-tracker
     plan: free
-    region: oregon
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: ./build
