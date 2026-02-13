@@ -18,11 +18,10 @@
       - key: GOOGLE_CREDENTIALS_JSON
         sync: false
 
-  - type: web
+  - type: static
     name: reel-tracker-frontend
-    runtime: static
     repo: https://github.com/Utkarsh6358/reel-show-tracker
-    plan: starter
+    plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: ./build
