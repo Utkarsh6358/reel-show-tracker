@@ -6,22 +6,9 @@ const reelRoutes = require("./routes/reelRoutes");
 
 const app = express();
 
-// ✅ Updated CORS for production
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:5000',
-  'https://your-frontend-url.onrender.com', // Add after frontend deploy
-  'https://your-backend-url.onrender.com'
-];
-
+// Updated CORS for production
 app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: ['http://localhost:3000', 'https://reel-tracker-frontend.onrender.com'],
   credentials: true
 }));
 
@@ -30,26 +17,31 @@ app.use(express.json({ limit: '10mb' }));
 // Request logging
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-  console.log('Origin:', req.headers.origin);
   next();
 });
 
+// Fix the endpoints display
 app.get("/", (req, res) => {
   res.json({ 
     status: "Reel Tracker API Running 🚀",
     version: "1.0.0",
     endpoints: {
-      submit: "POST /api/reels/submit",
-      pending: "GET /api/reels/pending",
-      confirm: "POST /api/shows/confirm/:id",
-      reject: "POST /api/shows/reject/:id",
-      history: "GET /api/shows/history"
-    }
+      "Submit Reel": "POST /api/reels/submit",
+      "Get Pending Reels": "GET /api/reels/pending",
+      "Confirm Show": "POST /api/shows/confirm/:id",
+      "Reject Reel": "POST /api/shows/reject/:id",
+      "Get History": "GET /api/shows/history"
+    },
+    note: "Your backend is working! Connect to it from your frontend."
   });
 });
 
 app.get("/health", (req, res) => {
-  res.json({ status: "healthy", timestamp: new Date().toISOString() });
+  res.json({ 
+    status: "healthy", 
+    timestamp: new Date().toISOString(),
+    message: "Backend is running smoothly"
+  });
 });
 
 app.use("/api/shows", showRoutes);
@@ -67,4 +59,5 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Health check: http://localhost:${PORT}/health`);
 });
