@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: reel-tracker-backend
+    runtime: node
+    repo: https://github.com/Utkarsh6358/reel-show-tracker
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: OMDB_KEY
+        sync: false
+      - key: SHEET_ID
+        sync: false
+      - key: GOOGLE_CREDENTIALS_JSON
+        sync: false
+
+  - type: web
+    name: reel-tracker-frontend
+    runtime: static
+    repo: https://github.com/Utkarsh6358/reel-show-tracker
+    plan: free
+    region: oregon
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./build
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://reel-tracker-backend.onrender.com
+      - key: REACT_APP_OMDB_KEY
+        sync: false
