@@ -18,7 +18,7 @@
       - key: GOOGLE_CREDENTIALS_JSON
         sync: false
 
-  - type: web
+  - type: static
     name: reel-tracker-frontend
     runtime: static
     repo: https://github.com/Utkarsh6358/reel-show-tracker
@@ -26,6 +26,14 @@
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: ./build
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
     envVars:
       - key: REACT_APP_API_URL
         value: https://reel-tracker-backend.onrender.com
