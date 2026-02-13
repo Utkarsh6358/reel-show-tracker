@@ -22,7 +22,7 @@
     name: reel-tracker-frontend
     runtime: static
     repo: https://github.com/Utkarsh6358/reel-show-tracker
-    plan: free
+    plan: starter
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: ./build
