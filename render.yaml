@@ -18,7 +18,7 @@
       - key: GOOGLE_CREDENTIALS_JSON
         sync: false
 
-  - type: static
+  - type: web
     name: reel-tracker-frontend
     runtime: static
     repo: https://github.com/Utkarsh6358/reel-show-tracker
