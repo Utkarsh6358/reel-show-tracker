@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { confirmShow, rejectShow } from "../services/api";
 
 const OMDB_KEY = process.env.REACT_APP_OMDB_KEY;
@@ -8,22 +8,36 @@ function ShowList({ shows, refreshShows, userId }) {
   const [searchResults, setSearchResults] = useState({});
   const [searchTerms, setSearchTerms] = useState({});
 
-  const searchOMDb = async (query, id) => {
-    if (!query) return;
-    
+  const searchTimeouts = useRef({});
+
+  const handleSearchChange = (query, id) => {
+    // 1. Instantly update UI text so typing is butter smooth
     setSearchTerms(prev => ({ ...prev, [id]: query }));
 
-    const res = await fetch(
-      `https://www.omdbapi.com/?apikey=${OMDB_KEY}&s=${encodeURIComponent(query)}`
-    );
-    const data = await res.json();
-
-    if (data.Search) {
-      setSearchResults(prev => ({
-        ...prev,
-        [id]: data.Search
-      }));
+    // 2. Clear previous timeout if user keeps typing
+    if (searchTimeouts.current[id]) {
+      clearTimeout(searchTimeouts.current[id]);
     }
+
+    // 3. Set new timeout to fetch ONLY after 500ms of no typing
+    searchTimeouts.current[id] = setTimeout(async () => {
+      if (!query.trim()) {
+        setSearchResults(prev => { const n = {...prev}; delete n[id]; return n; });
+        return;
+      }
+      
+      try {
+        const res = await fetch(`https://www.omdbapi.com/?apikey=${OMDB_KEY}&s=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        if (data.Search) {
+          setSearchResults(prev => ({ ...prev, [id]: data.Search }));
+        } else {
+          setSearchResults(prev => ({ ...prev, [id]: [] })); // clear if no results
+        }
+      } catch (e) {
+        console.error("OMDb search failed", e);
+      }
+    }, 500);
   };
 
   const handleConfirm = async (show) => {
@@ -92,7 +106,7 @@ function ShowList({ shows, refreshShows, userId }) {
             placeholder="Search movie by title..."
             className="w-full p-2 rounded bg-black border border-gray-700 mb-3 text-white"
             value={searchTerms[show.id] || ""}
-            onChange={(e) => searchOMDb(e.target.value, show.id)}
+            onChange={(e) => handleSearchChange(e.target.value, show.id)}
           />
 
           {searchResults[show.id] && (
