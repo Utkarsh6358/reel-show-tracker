@@ -166,9 +166,9 @@ app.get("/debug/google", async (req, res) => {
 // Test endpoint to check CORS
 app.get("/test-cors", (req, res) => {
   res.json({
-    message: "CORS is working!",
+    status: 'ok',
     yourOrigin: req.headers.origin,
-    allowedOrigins: allowedOrigins,
+    isAllowed: isAllowedOrigin(req.headers.origin),
     headers: req.headers
   });
 });
@@ -198,5 +198,4 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Health check: http://localhost:${PORT}/health`);
   console.log(`✅ Debug endpoint: http://localhost:${PORT}/debug/google`);
   console.log(`✅ Test CORS: http://localhost:${PORT}/test-cors`);
-  console.log(`✅ Allowed origins:`, allowedOrigins);
 });
