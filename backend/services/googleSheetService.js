@@ -286,7 +286,7 @@ exports.deleteConfirmedShow = async (title, userId) => {
   try {
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: "ConfirmedShows!A:A",
+      range: "ConfirmedShows!A:J",
     });
     const rows = res.data.values || [];
     const rowIndex = rows.findIndex((row, i) => i > 0 && row[0] === title && (!userId || row[9] === userId));
@@ -320,14 +320,14 @@ exports.deleteConfirmedShow = async (title, userId) => {
   }
 };
 
-exports.updateConfirmedShowStatus = async (title, status) => {
+exports.updateConfirmedShowStatus = async (title, status, userId) => {
   try {
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: "ConfirmedShows!A:A",
+      range: "ConfirmedShows!A:J",
     });
     const rows = res.data.values || [];
-    const rowIndex = rows.findIndex((row, i) => i > 0 && row[0] === title);
+    const rowIndex = rows.findIndex((row, i) => i > 0 && row[0] === title && (!userId || row[9] === userId));
 
     if (rowIndex === -1) return false;
 
