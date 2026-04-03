@@ -1,4 +1,4 @@
-﻿services:
+services:
   - type: web
     name: reel-tracker-backend
     runtime: node
@@ -37,4 +37,6 @@
       - key: REACT_APP_API_URL
         value: https://reel-tracker-backend.onrender.com
       - key: REACT_APP_OMDB_KEY
+        sync: false
+      - key: REACT_APP_TMDB_KEY
         sync: false
