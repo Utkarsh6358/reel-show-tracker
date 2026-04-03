@@ -2,7 +2,8 @@ const TMDB_KEY = process.env.REACT_APP_TMDB_KEY;
 const BASE = "https://api.themoviedb.org/3";
 
 const get = async (path) => {
-  const res = await fetch(`${BASE}${path}?api_key=${TMDB_KEY}&language=en-US`);
+  const separator = path.includes("?") ? "&" : "?";
+  const res = await fetch(`${BASE}${path}${separator}api_key=${TMDB_KEY}&language=en-US`);
   if (!res.ok) throw new Error(`TMDB error: ${res.status}`);
   return res.json();
 };
@@ -23,3 +24,5 @@ export const fetchSeriesDetails = (id) => get(`/tv/${id}`);
 
 export const fetchDetails = (id, mediaType) =>
   mediaType === "movie" ? fetchMovieDetails(id) : fetchSeriesDetails(id);
+
+export const fetchSearchResults = (query) => get(`/search/multi?query=${encodeURIComponent(query)}`);
