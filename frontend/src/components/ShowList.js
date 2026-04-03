@@ -3,7 +3,7 @@ import { confirmShow, rejectShow } from "../services/api";
 
 const OMDB_KEY = process.env.REACT_APP_OMDB_KEY;
 
-function ShowList({ shows, refreshShows }) {
+function ShowList({ shows, refreshShows, userId }) {
   const [selected, setSelected] = useState({});
   const [searchResults, setSearchResults] = useState({});
   const [searchTerms, setSearchTerms] = useState({});
@@ -31,7 +31,7 @@ function ShowList({ shows, refreshShows }) {
     if (!movie) return alert("Please search and select a movie first");
     
     try {
-      await confirmShow(show.id, movie.Title, show.reelLink);  // ✅ Send title only
+      await confirmShow(show.id, movie.Title, show.reelLink, userId);
       refreshShows();
       // Clear selection after confirm
       setSelected(prev => {
@@ -115,7 +115,7 @@ function ShowList({ shows, refreshShows }) {
                     }`}
                   >
                     <img
-                      src={movie.Poster !== "N/A" ? movie.Poster : 'https://via.placeholder.com/300x450?text=No+Poster'}
+                      src={movie.Poster !== "N/A" ? movie.Poster : 'https://placehold.co/300x450/27272a/71717a?text=No+Poster'}
                       alt={movie.Title}
                       className="rounded w-full h-32 object-cover"
                     />

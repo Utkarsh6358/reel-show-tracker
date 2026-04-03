@@ -16,6 +16,7 @@ exports.fetchShowDetails = async (title) => {
       Plot: response.data.Plot,
       imdbRating: response.data.imdbRating,
       Type: response.data.Type,
+      Poster: response.data.Poster,
     };
   } catch (err) {
     console.error("OMDb fetch error:", err);

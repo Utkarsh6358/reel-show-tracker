@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const showRoutes = require("./routes/showRoutes");
 const reelRoutes = require("./routes/reelRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
@@ -175,6 +176,7 @@ app.get("/test-cors", (req, res) => {
 });
 
 // Routes
+app.use("/api/auth", authRoutes);
 app.use("/api/shows", showRoutes);
 app.use("/api/reels", reelRoutes);
 

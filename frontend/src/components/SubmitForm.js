@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { addReel } from "../services/api";
 
-export default function SubmitForm({ onSubmitSuccess }) {  // Note: prop is onSubmitSuccess
+export default function SubmitForm({ onSubmitSuccess, userId }) {
   const [link, setLink] = useState("");
   const [caption, setCaption] = useState("");  // Add caption field
   const [loading, setLoading] = useState(false);
@@ -18,7 +18,7 @@ export default function SubmitForm({ onSubmitSuccess }) {  // Note: prop is onSu
     setError("");
     
     try {
-      await addReel(link, caption);
+      await addReel(link, caption, userId);
       setLink("");
       setCaption("");
       onSubmitSuccess();  // Refresh the pending list

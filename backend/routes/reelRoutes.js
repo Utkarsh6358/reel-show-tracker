@@ -8,7 +8,7 @@ const {
 
 // Submit Reel (from extension or manual input)
 router.post("/submit", async (req, res) => {
-  const { reelLink, caption } = req.body;
+  const { reelLink, caption, userId } = req.body;
 
   if (!reelLink) {
     return res.status(400).json({ error: "Reel link required" });
@@ -21,6 +21,7 @@ router.post("/submit", async (req, res) => {
       id,
       reelLink,
       caption: caption || "",
+      userId: userId || "",
     });
 
     res.json({ message: "Reel added to pending", id });
@@ -32,8 +33,9 @@ router.post("/submit", async (req, res) => {
 
 // Get Pending Reels
 router.get("/pending", async (req, res) => {
+  const userId = req.query.userId;
   try {
-    const reels = await getPendingReels();
+    const reels = await getPendingReels(userId);
     res.json(reels);
   } catch (err) {
     console.error(err);
