@@ -7,25 +7,23 @@ const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
-// ✅ CORRECTED CORS CONFIGURATION
-const allowedOrigins = [
-  'http://localhost:3000',
-  'https://reel-show-tracker-n0i5zo3bb-utkarsh-kumars-projects-0743eada.vercel.app',
-  'https://reel-show-tracker-2tky433yq-utkarsh-kumars-projects-0743eada.vercel.app',
-  'https://reel-show-tracker.onrender.com'
-];
+// ✅ CORS CONFIGURATION
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  if (origin === 'http://localhost:3000') return true;
+  if (origin === 'https://reel-show-tracker.onrender.com') return true;
+  // Allow any Vercel deployment (preview + production)
+  if (origin.endsWith('.vercel.app')) return true;
+  return false;
+};
 
 app.use(cors({
   origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps, curl, etc)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) === -1) {
-      console.log('❌ Blocked origin:', origin);
-      return callback(new Error('CORS not allowed'), false);
+    if (isAllowedOrigin(origin)) {
+      return callback(null, true);
     }
-    console.log('✅ Allowed origin:', origin);
-    return callback(null, true);
+    console.log('❌ Blocked origin:', origin);
+    return callback(new Error('CORS not allowed'), false);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -46,7 +44,7 @@ app.use((req, res, next) => {
   
   // Add CORS headers manually as backup
   const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
+  if (isAllowedOrigin(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
