@@ -219,6 +219,16 @@ export default function HomePage({ userId }) {
     return () => clearInterval(interval);
   }, [trending.length, isHoveringHero]);
 
+  const goToPrevSlide = (e) => {
+    e.stopPropagation();
+    setCurrentSlide((prev) => (prev === 0 ? Math.min(5, trending.length) - 1 : prev - 1));
+  };
+
+  const goToNextSlide = (e) => {
+    e.stopPropagation();
+    setCurrentSlide((prev) => (prev + 1) % Math.min(5, trending.length));
+  };
+
   useEffect(() => {
     const load = async () => {
       try {
@@ -332,16 +342,33 @@ export default function HomePage({ userId }) {
           </div>
           
           {/* Slideshow Indicators */}
-          <div className="absolute bottom-5 right-6 flex gap-2">
+          <div className="absolute bottom-5 right-6 flex gap-2 z-10">
             {Array.from({ length: Math.min(5, trending.length) }).map((_, i) => (
               <div
                 key={i}
-                className={`h-1.5 rounded-full transition-all duration-500 ${
+                onClick={(e) => { e.stopPropagation(); setCurrentSlide(i); }}
+                className={`h-1.5 rounded-full transition-all duration-500 cursor-pointer hover:bg-white ${
                   i === currentSlide ? "w-8 bg-white" : "w-2 bg-white/30"
                 }`}
               />
             ))}
           </div>
+
+          {/* Left Arrow */}
+          <button 
+            onClick={goToPrevSlide}
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 flex items-center justify-center rounded-full bg-black/30 hover:bg-black/60 text-white/50 hover:text-white backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300"
+          >
+            <span className="text-3xl font-black shrink-0">&lsaquo;</span>
+          </button>
+
+          {/* Right Arrow */}
+          <button 
+            onClick={goToNextSlide}
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 flex items-center justify-center rounded-full bg-black/30 hover:bg-black/60 text-white/50 hover:text-white backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300"
+          >
+            <span className="text-3xl font-black shrink-0">&rsaquo;</span>
+          </button>
         </div>
       )}
 
