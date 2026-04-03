@@ -42,9 +42,9 @@ app.use((req, res, next) => {
   console.log('Origin:', req.headers.origin);
   console.log('User-Agent:', req.headers['user-agent']);
   
-  // Add CORS headers manually as backup
+  // Ensure we don't set invalid headers if origin is undefined
   const origin = req.headers.origin;
-  if (isAllowedOrigin(origin)) {
+  if (origin && isAllowedOrigin(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
