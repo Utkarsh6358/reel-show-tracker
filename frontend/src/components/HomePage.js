@@ -145,6 +145,18 @@ export default function HomePage({ userId }) {
   const [isSearching, setIsSearching] = useState(false);
   const searchTimeout = window.useRef ? window.useRef(null) : { current: null };
 
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isHoveringHero, setIsHoveringHero] = useState(false);
+
+  // Auto-slide Hero Banner
+  useEffect(() => {
+    if (trending.length === 0 || isHoveringHero) return;
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % Math.min(5, trending.length)); // Cycle top 5
+    }, 5000); // 5 seconds per slide
+    return () => clearInterval(interval);
+  }, [trending.length, isHoveringHero]);
+
   useEffect(() => {
     const load = async () => {
       try {
@@ -208,7 +220,7 @@ export default function HomePage({ userId }) {
     return items.filter((i) => i.media_type === typeFilter);
   };
 
-  const featuredItem = trending[0];
+  const featuredItem = trending[currentSlide];
   const featuredBg = featuredItem?.backdrop_path ? IMG(featuredItem.backdrop_path, "original") : null;
   const featuredTitle = featuredItem?.title || featuredItem?.name || "";
   const featuredRating = featuredItem?.vote_average?.toFixed(1);
@@ -216,30 +228,57 @@ export default function HomePage({ userId }) {
 
   return (
     <div>
-      {/* Hero Banner */}
+      {/* Hero Banner (Slideshow) */}
       {featuredItem && (
         <div
           className="relative rounded-2xl overflow-hidden mb-10 h-72 md:h-96 cursor-pointer group"
           onClick={() => setSelectedShow(featuredItem)}
+          onMouseEnter={() => setIsHoveringHero(true)}
+          onMouseLeave={() => setIsHoveringHero(false)}
         >
           {featuredBg ? (
-            <img src={featuredBg} alt={featuredTitle} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+            <img 
+              key={featuredBg} /* Key forces re-render for smooth transition if we wanted CSS anims, but works fine here */
+              src={featuredBg} 
+              alt={featuredTitle} 
+              className="w-full h-full object-cover animate-in fade-in zoom-in-95 duration-1000" 
+            />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-blue-900 to-purple-900" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent" />
-          <div className="absolute inset-0 flex flex-col justify-end p-8">
-            <span className="text-xs text-purple-400 font-bold uppercase tracking-widest mb-2">🔥 Trending #1 This Week</span>
-            <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-3 max-w-xl leading-tight">{featuredTitle}</h2>
-            <p className="text-gray-300 text-sm max-w-md line-clamp-2 mb-4">{featuredOverview}</p>
-            <div className="flex items-center gap-4">
+          <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/60 to-transparent" />
+          <div className="absolute inset-0 flex flex-col justify-end p-8 w-full md:w-2/3">
+            <span className="text-xs text-purple-400 font-bold uppercase tracking-widest mb-2">
+              🔥 Trending #{currentSlide + 1} This Week
+            </span>
+            <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-3 leading-tight animate-in slide-in-from-left-4 fade-in duration-700">
+              {featuredTitle}
+            </h2>
+            <p className="text-gray-300 text-sm line-clamp-3 mb-6 animate-in slide-in-from-left-8 fade-in duration-1000">
+              {featuredOverview}
+            </p>
+            <div className="flex items-center gap-4 animate-in slide-in-from-bottom-4 fade-in duration-700">
               {featuredRating && (
-                <span className="flex items-center gap-1 text-amber-400 font-bold">⭐ {featuredRating}</span>
+                <span className="flex items-center gap-1 text-amber-400 font-bold bg-black/50 px-3 py-1.5 rounded-lg border border-amber-500/20">
+                  ⭐ {featuredRating}
+                </span>
               )}
-              <button className="px-5 py-2.5 bg-white text-black rounded-lg font-bold text-sm hover:bg-gray-100 transition">
+              <button className="px-6 py-2.5 bg-white text-black rounded-xl font-bold text-sm hover:bg-gray-200 transition shadow-lg shadow-white/10 hover:scale-105">
                 View Details
               </button>
             </div>
+          </div>
+          
+          {/* Slideshow Indicators */}
+          <div className="absolute bottom-5 right-6 flex gap-2">
+            {Array.from({ length: Math.min(5, trending.length) }).map((_, i) => (
+              <div
+                key={i}
+                className={`h-1.5 rounded-full transition-all duration-500 ${
+                  i === currentSlide ? "w-8 bg-white" : "w-2 bg-white/30"
+                }`}
+              />
+            ))}
           </div>
         </div>
       )}
