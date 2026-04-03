@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   fetchTrending,
   fetchPopularMovies,
@@ -55,8 +55,18 @@ function PosterCard({ item, onClick }) {
 }
 
 function ScrollRow({ title, emoji, items, onCardClick, loading }) {
+  const rowRef = useRef(null);
+
+  const scroll = (direction) => {
+    if (rowRef.current) {
+      const { scrollLeft, clientWidth } = rowRef.current;
+      const scrollTo = direction === "left" ? scrollLeft - clientWidth * 0.75 : scrollLeft + clientWidth * 0.75;
+      rowRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
+    }
+  };
+
   return (
-    <div className="mb-10">
+    <div className="mb-10 relative group">
       <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
         <span>{emoji}</span> {title}
       </h2>
@@ -67,10 +77,31 @@ function ScrollRow({ title, emoji, items, onCardClick, loading }) {
           ))}
         </div>
       ) : (
-        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
-          {items.map((item) => (
-            <PosterCard key={`${item.id}-${item.media_type}`} item={item} onClick={onCardClick} />
-          ))}
+        <div className="relative">
+          {/* Scroll Left Button */}
+          <button 
+            onClick={() => scroll("left")}
+            className="absolute left-0 top-0 bottom-0 z-40 w-12 bg-gradient-to-r from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-start pl-2 text-white hover:text-purple-400"
+          >
+            <span className="text-3xl font-black shrink-0">&lsaquo;</span>
+          </button>
+
+          <div 
+            ref={rowRef}
+            className="flex gap-4 overflow-x-auto pb-2 scrollbar-none pt-2"
+          >
+            {items.map((item) => (
+              <PosterCard key={`${item.id}-${item.media_type}`} item={item} onClick={onCardClick} />
+            ))}
+          </div>
+
+          {/* Scroll Right Button */}
+          <button 
+            onClick={() => scroll("right")}
+            className="absolute right-0 top-0 bottom-0 z-40 w-12 bg-gradient-to-l from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-end pr-2 text-white hover:text-purple-400"
+          >
+            <span className="text-3xl font-black shrink-0">&rsaquo;</span>
+          </button>
         </div>
       )}
     </div>
@@ -107,11 +138,21 @@ function Top10Card({ item, index, onClick }) {
 }
 
 function Top10Row({ items, onCardClick, loading }) {
+  const rowRef = useRef(null);
+
+  const scroll = (direction) => {
+    if (rowRef.current) {
+      const { scrollLeft, clientWidth } = rowRef.current;
+      const scrollTo = direction === "left" ? scrollLeft - clientWidth * 0.75 : scrollLeft + clientWidth * 0.75;
+      rowRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
+    }
+  };
+
   if (!items.length && !loading) return null;
   const top10 = items.slice(0, 10);
 
   return (
-    <div className="mb-14 mt-4">
+    <div className="mb-14 mt-4 relative group">
       <h2 className="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-2 px-1">
         <span>🏆</span> Top 10 Trending Today
       </h2>
@@ -122,10 +163,31 @@ function Top10Row({ items, onCardClick, loading }) {
           ))}
         </div>
       ) : (
-        <div className="flex gap-1 md:gap-2 overflow-x-auto pb-8 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent pt-8 pl-4 items-end">
-          {top10.map((item, index) => (
-            <Top10Card key={`${item.id}-top10`} item={item} index={index} onClick={onCardClick} />
-          ))}
+        <div className="relative">
+          {/* Scroll Left Button */}
+          <button 
+            onClick={() => scroll("left")}
+            className="absolute left-0 top-0 bottom-0 z-40 w-12 bg-gradient-to-r from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-start pl-2 text-white hover:text-purple-400 -ml-2"
+          >
+            <span className="text-4xl font-black shrink-0">&lsaquo;</span>
+          </button>
+
+          <div 
+            ref={rowRef}
+            className="flex gap-1 md:gap-2 overflow-x-auto pb-8 scrollbar-none pt-8 pl-4 items-end"
+          >
+            {top10.map((item, index) => (
+              <Top10Card key={`${item.id}-top10`} item={item} index={index} onClick={onCardClick} />
+            ))}
+          </div>
+
+          {/* Scroll Right Button */}
+          <button 
+            onClick={() => scroll("right")}
+            className="absolute right-0 top-0 bottom-0 z-40 w-12 bg-gradient-to-l from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-end pr-2 text-white hover:text-purple-400"
+          >
+            <span className="text-4xl font-black shrink-0">&rsaquo;</span>
+          </button>
         </div>
       )}
     </div>
