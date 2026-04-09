@@ -71,7 +71,7 @@ export default function ShowDetailModal({ show, onClose, userId }) {
 
   const youtubeSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(title + " trailer scene clip")}`;
   const instagramUrl = `https://www.instagram.com/explore/tags/${encodeURIComponent(title.replace(/\s+/g, '').toLowerCase())}`;
-  const streamExUrl = `https://streamex.sh/search?query=${encodeURIComponent(title).replace(/%20/g, '+')}`;
+  const streamExUrl = `https://streamex.sh/search?query=${encodeURIComponent(title.toLowerCase()).replace(/%20/g, '+')}`;
   const animeKaiUrl = `https://animekai.to/browser?keyword=${encodeURIComponent(title)}`;
 
   const handleAddToWatchlist = async () => {
